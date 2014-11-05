@@ -176,33 +176,17 @@ fi
   fi
 )
 
-# this is required to execute bundle and store gems in cachedir
-# we do it globally because we want to be able to run bundle even
-# from within grunt
-export HOME=$build_dir
+# install compass
+status "Installing Compass"
 export GEM_HOME=$build_dir/.gem/ruby/1.9.1
-export PATH="$GEM_HOME/bin:$PATH"
-
-(
-  # porting in compass install
-  # install compass
-  status "Installing Compass"
-  export LANG=en_US.UTF-8
-  export LC_ALL=en_US.UTF8
-  if test -d $cache_dir/ruby/.gem; then
-    status "Restoring ruby gems directory from cache"
-    cp -r $cache_dir/ruby/.gem $build_dir
-    gem update bundler --user-install --no-rdoc --no-ri 2>&1 | indent
-  else
-    gem install bundler --user-install --no-rdoc --no-ri 2>&1 | indent
-  fi
-
-  # Run bundler
-  bundle install 2>&1 | indent
-
-  # Run compass
-  HOME=$build_dir bundle exec compass compile
-)
+PATH="$GEM_HOME/bin:$PATH"
+if test -d $cache_dir/ruby/.gem; then
+  status "Restoring ruby gems directory from cache"
+  cp -r $cache_dir/ruby/.gem $build_dir
+  HOME=$build_dir gem update compass --user-install --no-rdoc --no-ri
+else
+  HOME=$build_dir gem install compass --user-install --no-rdoc --no-ri
+fi
 
 # cache ruby gems compass
 rm -rf $cache_dir/ruby
